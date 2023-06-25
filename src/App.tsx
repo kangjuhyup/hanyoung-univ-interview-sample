@@ -1,24 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import HeaderComponent from './component/common/header.component';
+import MainPage from './page/main.page';
 
 function App() {
+  const { ipcRenderer } = window.require("electron"); 
+  const sendMail = () => { 
+    ipcRenderer.send('ping', 'send'); 
+  } 
+
+  useEffect(() => {
+    // 이벤트 리스너 등록
+    ipcRenderer.on('pong', (event:any, arg:any) => {
+      console.log('Main sent a pong!!!');
+      // 여기에서 pong 메시지를 처리하거나 필요한 작업을 수행합니다.
+      console.log(arg)
+    });
+  
+    return () => {
+      // 컴포넌트가 언마운트될 때 이벤트 리스너를 정리합니다.
+      ipcRenderer.removeAllListeners('pong');
+    };
+  }, []);
+  
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <QueryClientProvider client={new QueryClient}>
+
+        <HeaderComponent/>
+      <MainPage/>
+      </QueryClientProvider>
     </div>
   );
 }

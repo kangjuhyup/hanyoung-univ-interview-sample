@@ -5,6 +5,11 @@
 /.pnp
 .pnp.js
 
+/build
+/dist
+
+/public/voice
+
 # testing
 /coverage
 
