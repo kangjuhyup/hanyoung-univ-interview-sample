@@ -14,11 +14,15 @@ const CameraCompoenentBody = styled.div`
 `;
 
 const CameraCompoent = () => {
-  const { webcamRef,time } = CamearaController();
+  const { hasWebcam, webcamRef,time } = CamearaController();
   return (
     <CameraCompoenentBody>
         {time > 0 ? <p style={{position:"absolute",top:"0px"}}>남은시간 : {time}</p> : <></> }
-      <Webcam style={{ width:'400px',height:'400px'}} audio={true} ref={webcamRef} mirrored={true} />
+        {hasWebcam ? (
+        <Webcam style={{ width: '400px', height: '400px' }} audio={true} ref={webcamRef} mirrored={true} />
+      ) : (
+        <p>웹캠을 지원하지 않는 기기입니다.</p>
+      )}
     </CameraCompoenentBody>
   );
 };

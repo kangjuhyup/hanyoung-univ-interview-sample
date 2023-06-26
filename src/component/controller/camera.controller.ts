@@ -6,12 +6,15 @@ import roundStore from "../../store/round.store";
 import voiceStore from "../../store/voice.store";
 
 export const CamearaController = () => {
+  const [ hasWebcam, setWebcam] = useState(false);
   const { isEnd: voiceEnd } = voiceStore();
   const { round } = roundStore();
   const { isStart: cameraStart, start, stop } = cameraStore();
   const [recoder, setRecoder] = useState<MediaRecorder>();
   const [time, setTime] = useState(-1);
   const intervalRef = useRef<number | null>(null);
+
+
 
   const startInterval = () => {
     intervalRef.current = window.setInterval(() => {
@@ -46,6 +49,15 @@ export const CamearaController = () => {
       startRecording();
     }
   }, [voiceEnd]);
+
+  const checkWebcam = () => {
+    return navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+
+  }
+  useEffect(() => {
+    const webcam = checkWebcam()
+    setWebcam(!!webcam)
+  },[])
 
   const webcamRef = useRef<Webcam>(null);
 
@@ -90,6 +102,7 @@ export const CamearaController = () => {
   };
 
   return {
+    hasWebcam,
     webcamRef,
     time,
   };

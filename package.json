@@ -120,6 +120,6 @@
       "buildResources": "assets"
     },
     "extraResources": "voice/*.mp3",
-    "icon": "logo/hy.svg"
+    "icon": "assets/icons/png/hy.png"
   }
 }
