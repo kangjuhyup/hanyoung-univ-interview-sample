@@ -1,22 +1,40 @@
 import { useEffect } from "react";
+import styled from "styled-components";
 import AudioController from "./controller/audio.controller";
 
+export const AudioComponentBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  padding: 0 20px;
+`;
 
-const AudioComponent = (props:{
-    voiceSrc : string
-}) => {
-    const {audioRef,onPlay,onEnded,changeSource} = AudioController();
+const AudioComponent = (props: { voiceSrc: string; text: string }) => {
+  const { audioRef, onPlay, onEnded, changeSource } = AudioController();
 
+  useEffect(() => {
+    changeSource(props.voiceSrc);
+  }, [props.voiceSrc]);
 
-
-    useEffect(() => {
-        changeSource(props.voiceSrc)
-    },[props.voiceSrc])
-
-    
   return (
-    <audio ref={audioRef} controls onPlay={onPlay} onEnded={onEnded}>
-    </audio>
+    <AudioComponentBody>
+      <audio ref={audioRef} onEnded={onEnded} />
+      <button
+        onClick={onPlay}
+        style={{
+          background: "transparent",
+          width: "40px",
+          border: "none",
+          outline: "none",
+        }}
+      >
+        <img src={process.env.PUBLIC_URL+'/icons/start.svg'} />
+      </button>
+
+      <p>{props.text}</p>
+    </AudioComponentBody>
   );
 };
 

@@ -13,7 +13,7 @@ const voiceStore = create<Voice>((set) => ({
   start: () => {
     set((state) => ({
       isStart: true,
-      isEnd : false,
+      isEnd : false
     }));
   },
   stop: () => {

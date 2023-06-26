@@ -13,6 +13,7 @@ const AudioController = () => {
     };
 
     const onPlay = () => {
+        audioRef.current?.play();
         start();
     }
 

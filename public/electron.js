@@ -15,7 +15,8 @@ function createMainWindow() {
         webPreferences: {
             contextIsolation: false,
             nodeIntegration: true
-        }
+        },
+        icon: path.join(__dirname, 'asstes/icons/png/hy.png')
     });
     mainWindow.once('ready-to-show', function () {
         mainWindow.show();

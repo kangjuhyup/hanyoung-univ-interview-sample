@@ -1,5 +1,6 @@
 {
-  "name": "interview",
+  "name": "hyu_interview",
+  "productName" : "hyu_interview",
   "version": "0.1.0",
   "private": true,
   "main": "public/electron.js",
@@ -118,6 +119,7 @@
       "app": ".",
       "buildResources": "assets"
     },
-    "extraResources": "voice/*.m4a"
+    "extraResources": "voice/*.mp3",
+    "icon": "logo/hy.svg"
   }
 }

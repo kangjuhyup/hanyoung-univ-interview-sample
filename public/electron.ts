@@ -20,6 +20,7 @@ function createMainWindow(): void {
 
       nodeIntegration: true,
     },
+    icon : path.join(__dirname,'asstes/icons/png/hy.png')
   });
 
   mainWindow.once('ready-to-show', () => {

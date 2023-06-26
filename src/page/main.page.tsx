@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import styled from "styled-components";
 import AudioComponent from "../component/audio.component";
 import CameraCompoent from "../component/camera.component";
@@ -14,11 +15,12 @@ const MainPageBody = styled.div`
 `;
 
 const MainPage = () => {
-    const { voiceSrc }= MainController();
+    const { voiceSrc ,text }= MainController();
+    
   return (
     <MainPageBody>
       <RoundComponent/>
-      <AudioComponent voiceSrc={voiceSrc} />
+      <AudioComponent voiceSrc={voiceSrc} text={text} />
       <CameraCompoent/>
     </MainPageBody>
   );

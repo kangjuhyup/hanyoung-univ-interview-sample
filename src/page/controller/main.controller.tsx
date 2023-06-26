@@ -1,38 +1,28 @@
 import { useEffect, useState } from "react";
-import { VOICE } from "../../const/voice.const";
+import { TEXT, VOICE } from "../../const/voice.const";
 import roundStore from "../../store/round.store";
-// import { ipcRenderer } from "electron";
 
 const MainController = () => {
   const { round } = roundStore();
   const [ voiceSrc , setVoiceSrc ] = useState<string>('');
+  const [ text, setText] = useState<string>('');
 
   useEffect(() => {
     voiceSource();
   },[round])
+
+
   const voiceSource = () => {
-    let name;
-    switch (round) {
-      case 0:
-        name = VOICE["INTRODUCE"];
-        break;
-      case 1:
-        name = VOICE["BOOK_OR_MOVIE"];
-        break;
-      case 2:
-        name = VOICE["FREIND"];
-        break;
-      case 3:
-        name = VOICE["RESPECT_PERSON"];
-        break;
-      default:
-        name = VOICE["INTRODUCE"];
-        break;
-    }
-      setVoiceSrc(`./voice/${name}.m4a`);
+    if(round === undefined) return;
+    if(process.env.NODE_ENV === 'production') setVoiceSrc(`./voice/${round}.mp3`);
+    else setVoiceSrc(`/voice/${round}.mp3`)
+    setText(TEXT[round]);
   };
+
+
   return {
     voiceSrc,
+    text,
   };
 };
 

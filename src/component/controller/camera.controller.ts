@@ -1,22 +1,55 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
+import { TEXT } from "../../const/voice.const";
 import cameraStore from "../../store/camera.store";
+import roundStore from "../../store/round.store";
 import voiceStore from "../../store/voice.store";
 
 export const CamearaController = () => {
+  const { isEnd: voiceEnd } = voiceStore();
+  const { round } = roundStore();
+  const { isStart: cameraStart, start, stop } = cameraStore();
+  const [recoder, setRecoder] = useState<MediaRecorder>();
+  const [time, setTime] = useState(-1);
+  const intervalRef = useRef<number | null>(null);
 
-  const {isEnd} = voiceStore();
-  const {start,stop} = cameraStore();
+  const startInterval = () => {
+    intervalRef.current = window.setInterval(() => {
+      setTime((prevTime) => prevTime - 1);
+    }, 1000);
+  };
+
+  const clearIntervalRef = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
 
   useEffect(() => {
-    if(isEnd) {
-      startRecording(10000);
+    if (cameraStart) {
+      startInterval();
+      return clearIntervalRef;
     }
-  },[isEnd]);
+  }, [cameraStart]);
+
+  useEffect(() => {
+    if (time === 0) {
+      stopRecording();
+      clearIntervalRef();
+    }
+  }, [time]);
+
+  useEffect(() => {
+    if (voiceEnd) {
+      setTime(10);
+      startRecording();
+    }
+  }, [voiceEnd]);
 
   const webcamRef = useRef<Webcam>(null);
 
-  const startRecording = (time:number) => {
+  const startRecording = () => {
     start();
     if (webcamRef.current) {
       const videoElem = webcamRef.current.video as HTMLVideoElement;
@@ -39,38 +72,27 @@ export const CamearaController = () => {
           document.body.appendChild(a);
           a.style.display = "none";
           a.href = url;
-          a.download = "recorded-video.webm";
+          a.download = `${TEXT[round]}.webm`;
           a.click();
           window.URL.revokeObjectURL(url);
           document.body.removeChild(a);
         };
 
         mediaRecorder.start();
-        setTimeout(() => {
-          stop();
-          mediaRecorder.stop();
-        }, time); 
+        setRecoder(mediaRecorder);
       }
     }
   };
 
   const stopRecording = () => {
-    if (webcamRef.current) {
-      const videoElem = webcamRef.current.video as HTMLVideoElement;
-      const mediaStream = videoElem.srcObject as MediaStream;
-  
-      if (mediaStream) {
-        const mediaTracks = mediaStream.getTracks();
-        mediaTracks.forEach((track) => {
-          track.stop();
-        });
-      }
-    }
+    stop();
+    recoder?.stop();
   };
 
   return {
     webcamRef,
-    
+    time,
   };
 };
+
 export default CamearaController;
