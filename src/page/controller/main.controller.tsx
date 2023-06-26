@@ -8,6 +8,7 @@ const MainController = () => {
   const [ text, setText] = useState<string>('');
 
   useEffect(() => {
+    console.log('maincoltroller : ', round);
     voiceSource();
   },[round])
 

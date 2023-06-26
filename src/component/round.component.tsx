@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import styled from "styled-components";
 import RoundController from "./controller/round.controller";
 
@@ -8,6 +9,9 @@ const RoundBody = styled.div`
 
 const RoundComponent = () => {
   const { round, clickNextRound, clickPrevRound } = RoundController();
+  useEffect(() => {
+    console.log('round : ',round);
+  },[round])
   return (
     <RoundBody>
       {

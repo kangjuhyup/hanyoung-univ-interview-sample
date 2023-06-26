@@ -4,6 +4,7 @@ interface Round {
   round: number;
   nextRound: () => void;
   prevRound: () => void;
+  setRound : (new_round:number) => void;
 }
 
 const roundStore = create<Round>((set) => ({
@@ -18,6 +19,11 @@ const roundStore = create<Round>((set) => ({
       round: state.round-1,
     }));
   },
+  setRound: (new_round:number) => {
+    set((state) => ({
+      round : new_round
+    }))
+  }
 }));
 
 export default roundStore;
