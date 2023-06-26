@@ -40,15 +40,28 @@ function createMainWindow(): void {
     mainWindow = null;
   });
 }
-ipcMain.on('requestVoicePath', (event, arg)=>{ 
-  const directoryPath = path.join(__dirname, 'voice');
-  const m4aFiles = fs.readdirSync(directoryPath).filter((filename) => {
-    return path.extname(filename) === '.m4a';
-  }).map((filename) => {
-    return directoryPath;
+const createDirectoryIfNotExists = (directoryPath) => {
+  if (!fs.existsSync(directoryPath)) {
+    fs.mkdirSync(directoryPath, { recursive: true });
+  }
+};
+
+ipcMain.on('saveVideo',(event,{name,data}) => {
+  const filePath = path.join(app.getPath("downloads"),'hyu_videos', name);
+  const directoryPath = path.dirname(filePath);
+  createDirectoryIfNotExists(directoryPath);
+  const buffer = Buffer.from(data);
+  fs.writeFile(filePath, buffer, (err) => {
+    if (err) {
+      console.error("파일 저장 중 오류 발생:", err);
+      event.reply("saveVideoResponse", { success: false, error: err });
+      return;
+    }
+
+    console.log("파일 저장 완료:", filePath);
+    event.reply("saveVideoResponse", { success: true });
   });
-  event.reply('responseVoicePath', m4aFiles);
-}) 
+})
 
 app.on('ready', (): void => {
     console.log('electron ready')

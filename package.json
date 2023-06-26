@@ -1,6 +1,5 @@
 {
   "name": "hyu_interview",
-  "productName" : "hyu_interview",
   "version": "0.1.0",
   "private": true,
   "main": "public/electron.js",
@@ -73,7 +72,7 @@
     "wait-on": "^7.0.1"
   },
   "build": {
-    "productName": "interview",
+    "productName": "huv_interview",
     "appId": "hy.univ.interview",
     "asar": true,
     "protocols": {
@@ -120,6 +119,6 @@
       "buildResources": "assets"
     },
     "extraResources": "voice/*.mp3",
-    "icon": "assets/icons/png/hy.png"
+    "icon": "public/assets/icons/png/hy.png"
   }
 }

@@ -33,14 +33,26 @@ function createMainWindow() {
         mainWindow = null;
     });
 }
-electron_1.ipcMain.on('requestVoicePath', function (event, arg) {
-    var directoryPath = path.join(__dirname, 'voice');
-    var m4aFiles = fs.readdirSync(directoryPath).filter(function (filename) {
-        return path.extname(filename) === '.m4a';
-    }).map(function (filename) {
-        return directoryPath;
+var createDirectoryIfNotExists = function (directoryPath) {
+    if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+    }
+};
+electron_1.ipcMain.on('saveVideo', function (event, _a) {
+    var name = _a.name, data = _a.data;
+    var filePath = path.join(electron_1.app.getPath("downloads"), 'hyu_videos', name);
+    var directoryPath = path.dirname(filePath);
+    createDirectoryIfNotExists(directoryPath);
+    var buffer = Buffer.from(data);
+    fs.writeFile(filePath, buffer, function (err) {
+        if (err) {
+            console.error("파일 저장 중 오류 발생:", err);
+            event.reply("saveVideoResponse", { success: false, error: err });
+            return;
+        }
+        console.log("파일 저장 완료:", filePath);
+        event.reply("saveVideoResponse", { success: true });
     });
-    event.reply('responseVoicePath', m4aFiles);
 });
 electron_1.app.on('ready', function () {
     console.log('electron ready');

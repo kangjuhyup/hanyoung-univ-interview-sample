@@ -6,15 +6,13 @@ import roundStore from "../../store/round.store";
 import voiceStore from "../../store/voice.store";
 
 export const CamearaController = () => {
-  const [ hasWebcam, setWebcam] = useState(false);
+  const [hasWebcam, setWebcam] = useState(false);
   const { isEnd: voiceEnd } = voiceStore();
   const { round } = roundStore();
   const { isStart: cameraStart, start, stop } = cameraStore();
   const [recoder, setRecoder] = useState<MediaRecorder>();
   const [time, setTime] = useState(-1);
   const intervalRef = useRef<number | null>(null);
-
-
 
   const startInterval = () => {
     intervalRef.current = window.setInterval(() => {
@@ -52,12 +50,11 @@ export const CamearaController = () => {
 
   const checkWebcam = () => {
     return navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
-
-  }
+  };
   useEffect(() => {
-    const webcam = checkWebcam()
-    setWebcam(!!webcam)
-  },[])
+    const webcam = checkWebcam();
+    setWebcam(!!webcam);
+  }, []);
 
   const webcamRef = useRef<Webcam>(null);
 
@@ -79,15 +76,40 @@ export const CamearaController = () => {
 
         mediaRecorder.onstop = () => {
           const blob = new Blob(chunks, { type: "video/webm" });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          document.body.appendChild(a);
-          a.style.display = "none";
-          a.href = url;
-          a.download = `${TEXT[round]}.webm`;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
+
+          if (process.env.NODE_ENV === "production") {
+            const { ipcRenderer } = window.require("electron");
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const buffer = reader.result;
+              const arrayBuffer = buffer != null ? buffer : new ArrayBuffer(0);
+
+              ipcRenderer.send("saveVideo", {
+                name: `${TEXT[round]}.webm`,
+                data: arrayBuffer,
+              });
+
+              ipcRenderer.on("saveVideoResponse", (event:any, response:any) => {
+                if (response.success) {
+                  console.log("파일 저장 완료");
+                } else {
+                  console.error("파일 저장 실패 : " , response.error);
+                }
+              });
+            };
+
+            reader.readAsArrayBuffer(blob);
+          } else {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            document.body.appendChild(a);
+            a.style.display = "none";
+            a.href = url;
+            a.download = `${TEXT[round]}.webm`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+          }
         };
 
         mediaRecorder.start();
