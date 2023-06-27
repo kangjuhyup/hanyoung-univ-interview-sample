@@ -1,10 +1,13 @@
 import { useRef } from "react";
-import voiceStore from "../../store/voice.store";
+import allStore from "../../store/all.store";
 
 
 const AudioController = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    const { start,stop } = voiceStore();
+    const {
+        audioStart,
+        audioStop,
+      } = allStore();
 
     const changeSource = (src:string) => {
         if (audioRef.current) {
@@ -14,11 +17,11 @@ const AudioController = () => {
 
     const onPlay = () => {
         audioRef.current?.play();
-        start();
+        audioStart();
     }
 
     const onEnded = () => {
-        stop()
+        audioStop()
     }
 
     return {

@@ -1,21 +1,22 @@
-import { useEffect } from "react";
-import cameraStore from "../../store/camera.store";
-import roundStore from "../../store/round.store";
+import allStore from "../../store/all.store";
 
 const RoundController = () => {
+  const {round,forceStop} = allStore();
 
-  const {round,nextRound,prevRound} = roundStore();
-  const {isEnd} = cameraStore();
 
-  useEffect(()=> {
-    if(isEnd) nextRound();
-  },[isEnd])
+  const clickNextRound = () => {
+    forceStop(round+1);
+  }
+
+  const clickPrevRound = () => {
+    forceStop(round-1);
+  }
 
 
   return {
     round,
-    clickNextRound : nextRound,
-    clickPrevRound : prevRound,
+    clickNextRound,
+    clickPrevRound,
   };
 };
 export default RoundController;

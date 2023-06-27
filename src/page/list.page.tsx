@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { TEXT } from "../const/voice.const";
-import roundStore from "../store/round.store";
+import allStore from "../store/all.store";
 
 const ListPageBody = styled.div`
   position: fixed;
@@ -17,27 +17,32 @@ const ListPageBody = styled.div`
   z-index: 9999;
 `;
 
-const ListPage = (props : {
-    handlePage:any
-}) => {
+const ListPage = (props: { handlePage: any }) => {
   const list: number[] = Array.from({ length: 20 }, (_, index) => index);
-  const { setRound } = roundStore();
+  const { forceStop } = allStore();
   const handleClick = (id: number) => {
-    setRound(id);
+      forceStop(id);
   };
+
   return (
     <ListPageBody>
-        <button onClick={()=>{props.handlePage(false)}}>닫기</button>
+      <button
+        onClick={() => {
+          props.handlePage(false);
+        }}
+      >
+        닫기
+      </button>
       <ul>
         {list.map((id) => (
           <li key={id}>
             <p>
-              {id+1} : {TEXT[id]}
+              {id + 1} : {TEXT[id]}
             </p>
             <button
               onClick={() => {
                 handleClick(id);
-                props.handlePage(false)
+                props.handlePage(false);
               }}
             >
               대답하기

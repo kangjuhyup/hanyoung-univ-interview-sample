@@ -14,10 +14,10 @@ const CameraCompoenentBody = styled.div`
 `;
 
 const CameraCompoent = () => {
-  const { hasWebcam, webcamRef,time } = CamearaController();
+  const { hasWebcam, webcamRef,remainingTime } = CamearaController();
   return (
     <CameraCompoenentBody>
-        {time > 0 ? <p style={{position:"absolute",top:"0px"}}>남은시간 : {time}</p> : <></> }
+        {remainingTime > 0 ? <p style={{position:"absolute",top:"0px"}}>남은시간 : {remainingTime}</p> : <></> }
         {hasWebcam ? (
         <Webcam style={{ width: '400px', height: '400px' }} audio={true} ref={webcamRef} mirrored={true} />
       ) : (

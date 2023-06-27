@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { TEXT, VOICE } from "../../const/voice.const";
-import roundStore from "../../store/round.store";
+import allStore from "../../store/all.store";
 
 const MainController = () => {
-  const { round } = roundStore();
+  const { round } = allStore();
   const [ voiceSrc , setVoiceSrc ] = useState<string>('');
   const [ text, setText] = useState<string>('');
 
   useEffect(() => {
-    console.log('maincoltroller : ', round);
     voiceSource();
   },[round])
 

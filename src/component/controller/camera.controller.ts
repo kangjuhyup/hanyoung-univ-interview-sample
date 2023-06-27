@@ -1,22 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { TEXT } from "../../const/voice.const";
-import cameraStore from "../../store/camera.store";
-import roundStore from "../../store/round.store";
-import voiceStore from "../../store/voice.store";
-
+import allStore from "../../store/all.store";
 export const CamearaController = () => {
+  const {
+    isCameraStart,
+    cameraStart,
+    cameraStop,
+    isAudioStart,
+    time,
+    round,
+    isSave,
+    isFirst,
+  } = allStore();
+
   const [hasWebcam, setWebcam] = useState(false);
-  const { isEnd: voiceEnd } = voiceStore();
-  const { round } = roundStore();
-  const { isStart: cameraStart, start, stop } = cameraStore();
   const [recoder, setRecoder] = useState<MediaRecorder>();
-  const [time, setTime] = useState(-1);
+  const [remainingTime, setRemainingTime] = useState(-1);
   const intervalRef = useRef<number | null>(null);
 
   const startInterval = () => {
     intervalRef.current = window.setInterval(() => {
-      setTime((prevTime) => prevTime - 1);
+      setRemainingTime((prev) => prev - 1);
     }, 1000);
   };
 
@@ -28,25 +33,33 @@ export const CamearaController = () => {
   };
 
   useEffect(() => {
-    if (cameraStart) {
+    if (remainingTime === 0) {
+      stopRecording();
+    }
+  }, [remainingTime]);
+
+  // 카메라 시작 시 remainingTime 감소 시작.
+  useEffect(() => {
+    if (isCameraStart) {
       startInterval();
       return clearIntervalRef;
     }
-  }, [cameraStart]);
+  }, [isCameraStart]);
 
+  // time 이 변경될 때 받아와 remainingTime 에 세팅
   useEffect(() => {
-    if (time === 0) {
-      stopRecording();
-      clearIntervalRef();
+    if (isCameraStart || time === -1) {
+      setRemainingTime(time);
     }
   }, [time]);
 
+  // 음성 종료 후 녹화 시작 및 time 세팅
   useEffect(() => {
-    if (voiceEnd) {
-      setTime(10);
+    if (!isAudioStart && !isFirst) {
+      console.log('startRecording')
       startRecording();
     }
-  }, [voiceEnd]);
+  }, [isAudioStart]);
 
   const checkWebcam = () => {
     return navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
@@ -56,10 +69,14 @@ export const CamearaController = () => {
     setWebcam(!!webcam);
   }, []);
 
+  useEffect(() => {
+    console.log('recoder : ' ,recoder)
+  },[recoder])
+
   const webcamRef = useRef<Webcam>(null);
 
   const startRecording = () => {
-    start();
+    cameraStart();
     if (webcamRef.current) {
       const videoElem = webcamRef.current.video as HTMLVideoElement;
       const mediaStream = videoElem.srcObject as MediaStream;
@@ -75,6 +92,8 @@ export const CamearaController = () => {
         };
 
         mediaRecorder.onstop = () => {
+          console.log('isSave : ' , isSave)
+          // if (!isSave) return;
           const blob = new Blob(chunks, { type: "video/webm" });
 
           if (process.env.NODE_ENV === "production") {
@@ -89,13 +108,16 @@ export const CamearaController = () => {
                 data: arrayBuffer,
               });
 
-              ipcRenderer.on("saveVideoResponse", (event:any, response:any) => {
-                if (response.success) {
-                  console.log("파일 저장 완료");
-                } else {
-                  console.error("파일 저장 실패 : " , response.error);
+              ipcRenderer.on(
+                "saveVideoResponse",
+                (event: any, response: any) => {
+                  if (response.success) {
+                    console.log("파일 저장 완료");
+                  } else {
+                    console.error("파일 저장 실패 : ", response.error);
+                  }
                 }
-              });
+              );
             };
 
             reader.readAsArrayBuffer(blob);
@@ -118,15 +140,21 @@ export const CamearaController = () => {
     }
   };
 
+  useEffect(() => {
+    if(!isCameraStart) {
+      recoder?.stop();
+    }
+  },[isCameraStart])
+
   const stopRecording = () => {
-    stop();
-    recoder?.stop();
+    cameraStop();
+
   };
 
   return {
     hasWebcam,
     webcamRef,
-    time,
+    remainingTime,
   };
 };
 
