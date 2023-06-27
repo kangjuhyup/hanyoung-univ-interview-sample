@@ -56,7 +56,6 @@ export const CamearaController = () => {
   // 음성 종료 후 녹화 시작 및 time 세팅
   useEffect(() => {
     if (!isAudioStart && !isFirst) {
-      console.log('startRecording')
       startRecording();
     }
   }, [isAudioStart]);
@@ -69,9 +68,6 @@ export const CamearaController = () => {
     setWebcam(!!webcam);
   }, []);
 
-  useEffect(() => {
-    console.log('recoder : ' ,recoder)
-  },[recoder])
 
   const webcamRef = useRef<Webcam>(null);
 
@@ -92,8 +88,6 @@ export const CamearaController = () => {
         };
 
         mediaRecorder.onstop = () => {
-          console.log('isSave : ' , isSave)
-          // if (!isSave) return;
           const blob = new Blob(chunks, { type: "video/webm" });
 
           if (process.env.NODE_ENV === "production") {
