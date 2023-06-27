@@ -1,17 +1,18 @@
-import { useEffect } from "react";
 import styled from "styled-components";
 import RoundController from "./controller/round.controller";
 
-const RoundBody = styled.div`
+const RoundComponentBody = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: center;
 `;
+
 
 const RoundComponent = () => {
   const { round, clickNextRound, clickPrevRound } = RoundController();
 
   return (
-    <RoundBody>
+    <RoundComponentBody>
       {
           round !== 20 ?
           <>
@@ -43,7 +44,7 @@ const RoundComponent = () => {
       </button>
       </>
       :<><p>면접이 종료되었습니다. 수고하셨습니다.</p></>}
-    </RoundBody>
+    </RoundComponentBody>
   );
 };
 

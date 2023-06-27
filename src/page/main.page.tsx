@@ -10,18 +10,19 @@ const MainPageBody = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 10px;
-  gap : 40px;
+  padding: 20px;
+  gap: 40px;
+  background-color: #f8f8f8;
 `;
 
 const MainPage = () => {
-    const { voiceSrc ,text }= MainController();
-    
+  const { voiceSrc, text } = MainController();
+
   return (
     <MainPageBody>
-      <RoundComponent/>
+      <RoundComponent />
       <AudioComponent voiceSrc={voiceSrc} text={text} />
-      <CameraCompoent/>
+      <CameraCompoent />
     </MainPageBody>
   );
 };

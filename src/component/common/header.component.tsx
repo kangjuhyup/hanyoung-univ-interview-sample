@@ -4,13 +4,50 @@ import ListPage from "../../page/list.page";
 
 const Header = styled.div`
   position: relative;
-  width: 100vw;
   height: 100px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: aqua;
+  background-color: #4e7fff;
+  padding: 20px;
+
+  .img {
+    width: 250px;
+    height: 80px;
+    margin-right: 16px;
+  }
+
+  .p {
+    font-size: 24px;
+    color: #ffffff;
+    font-weight: bold;
+  }
+
+  .button {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    background: transparent;
+    width: 40px;
+    height: 40px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+
+    .img {
+      width: 100%;
+      height: 100%;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
 `;
+
+
 
 const HeaderComponent = () => {
   const [isOpenList, setOpenList] = useState(false);

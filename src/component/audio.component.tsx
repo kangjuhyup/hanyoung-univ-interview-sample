@@ -2,13 +2,12 @@ import { useEffect } from "react";
 import styled from "styled-components";
 import AudioController from "./controller/audio.controller";
 
-export const AudioComponentBody = styled.div`
+const AudioComponentBody = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100vw;
-  padding: 0 20px;
+  width: 100%;
 `;
 
 const AudioComponent = (props: { voiceSrc: string; text: string }) => {

@@ -26,7 +26,7 @@ const allStore = create<All>((set) => ({
       ...state,
       isSave:true,
       isCameraStart: true,
-      time: 5,
+      time: 60,
     }));
   },
   cameraStop: () => {
