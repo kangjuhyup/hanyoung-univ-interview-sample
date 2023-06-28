@@ -2,7 +2,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as isDev from 'electron-is-dev';
+import * as sqlite3 from 'electron-sqlite3';
 
+const sqlitePath = path.join(__dirname, 'admin.db');
 const BASE_URL = 'http://localhost:3000';
 
 let mainWindow: BrowserWindow | null;
@@ -62,9 +64,23 @@ ipcMain.on('saveVideo',(event,{name,data}) => {
   });
 })
 
+ipcMain.on('saveVoice', async (event, { index, data }) => {
+  const voiceFilePath = path.join(__dirname, 'voice', `${index}.mp3`);
+  try {
+    const fileDescriptor = fs.openSync(voiceFilePath, 'w');
+    fs.writeFile(fileDescriptor,voiceFilePath, data);
+    event.reply('saveVoiceResponse', { success: true, path: voiceFilePath });
+  } catch (error) {
+    event.reply('saveVoiceResponse', { success: false, error: error });
+  }
+});
 app.on('ready', (): void => {
-    console.log('electron ready')
+  const db = new sqlite3.Database(sqlitePath);
   createMainWindow();
+  mainWindow.webContents.on('did-finish-load', () => {
+    // 일렉트론 setup 이 완료되면 react로 셋업메세지 전달.
+    mainWindow.webContents.send('admin-ready', db);
+  });
 });
 
 app.on('window-all-closed', (): void => {
