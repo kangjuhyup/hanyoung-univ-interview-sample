@@ -26,7 +26,7 @@ function createMainWindow(): void {
   });
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
+    if(mainWindow) mainWindow.show();
   });
 
   if (isDev) {
