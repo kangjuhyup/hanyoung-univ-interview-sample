@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "main": "public/electron.js",
+  "author": {
+    "email": "fog0510@gmail.com"
+  },
   "homepage": "./",
   "dependencies": {
     "@electron/remote": "^2.0.10",
@@ -15,6 +18,7 @@
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "electron-is-dev": "^2.0.0",
+    "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",
     "react-app-rewired": "^2.2.1",
@@ -22,19 +26,22 @@
     "react-query": "^3.39.3",
     "react-scripts": "5.0.1",
     "react-webcam": "^7.1.1",
+    "sqlite3": "^5.1.6",
     "styled-components": "^6.0.0-rc.6",
     "typescript": "^4.9.5",
+    "url": "^0.11.1",
+    "util": "^0.12.5",
     "web-vitals": "^2.1.4",
     "zustand": "^4.3.8"
   },
   "scripts": {
-    "react-start": "react-scripts start",
-    "react-build": "react-scripts build",
-    "react-test": "react-scripts test",
-    "react-eject": "react-scripts eject",
+    "react-start": "react-app-rewired start",
+    "react-build": "react-app-rewired build",
+    "react-test": "react-app-rewired test",
+    "react-eject": "react-app-rewired eject",
     "start-renderer": "cross-env BROWSER=none npm run react-start",
     "start-main": "electron .",
-    "compile-main": "tsc ./public/electron.ts",
+    "compile-main": "tsc ./public/*.ts",
     "start-main-after-renderer": "wait-on http://localhost:3000 && npm run start-main",
     "dev": "tsc ./public/electron.ts && concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && npx electron .\"",
     "pack": "npm run compile-main && npm run react-build && electron-builder --dir",
@@ -63,7 +70,6 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^7.1.0",
     "@types/styled-components": "^5.1.26",
     "concurrently": "^8.2.0",
     "cross-env": "^7.0.3",
@@ -99,7 +105,6 @@
     "linux": {
       "target": [
         "AppImage",
-        "deb",
         "rpm",
         "zip",
         "tar.gz"
@@ -119,7 +124,10 @@
       "app": ".",
       "buildResources": "assets"
     },
-    "extraResources": "voice/*.mp3",
+    "extraResources": [
+      "voice/*.mp3",
+      "database/*.db"
+    ],
     "icon": "public/assets/icons/png/hy.png"
   }
 }

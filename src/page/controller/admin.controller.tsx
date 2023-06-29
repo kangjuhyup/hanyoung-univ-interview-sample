@@ -11,7 +11,6 @@ const AdminController = () => {
     }[]
   >(Array(count).fill({}));
 
-  const {saveData} = dbStore();
 
   const handleInputChange = (type: INPUT_TYPE, index: number, value: any) => {
     const newData = [...datas];
@@ -37,13 +36,12 @@ const AdminController = () => {
 
   const handleComplete = () => {
     if (process.env.NODE_ENV === "production") {
-      const { ipcRenderer } = window.require("elctron");
+      const { ipcRenderer } = window.require("electron");
       datas.map((data,index) => {
         ipcRenderer.send("saveVoice",{index,data:data.file})
         ipcRenderer.once("saveVoiceResponse", (event:any, result:any) => {
           if(result.success) {
             const filePath = result.path;
-            saveData({index,text : data.text, file_path : filePath});
           }
         })
       })

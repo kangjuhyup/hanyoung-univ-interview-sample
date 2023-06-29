@@ -36,15 +36,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.dbFilePath = exports.dbFolderPath = void 0;
 var path = require("path");
 var fs = require("fs");
 var electron_1 = require("electron");
 var isDev = require("electron-is-dev");
-var sqlite3 = require("electron-sqlite3");
-var sqlitePath = path.join(__dirname, 'admin.db');
+var util_1 = require("./util");
+var db_1 = require("./db");
+var remoteMain = require("@electron/remote/main");
+exports.dbFolderPath = path.join(process.resourcesPath, 'database');
+exports.dbFilePath = path.join(exports.dbFolderPath, 'admin.db');
+var videoFolderPath = path.join(electron_1.app.getPath("downloads"), 'hyu_videos');
+var voiceFolderPath = path.join(__dirname, 'voice');
 var BASE_URL = 'http://localhost:3000';
 var mainWindow;
-var remoteMain = require("@electron/remote/main");
+var database;
+(0, util_1.createDirectoryIfNotExists)(exports.dbFolderPath);
+(0, util_1.createDirectoryIfNotExists)(videoFolderPath);
 remoteMain.initialize();
 function createMainWindow() {
     mainWindow = new electron_1.BrowserWindow({
@@ -57,7 +65,8 @@ function createMainWindow() {
         icon: path.join(__dirname, 'asstes/icons/png/hy.png')
     });
     mainWindow.once('ready-to-show', function () {
-        mainWindow.show();
+        if (mainWindow)
+            mainWindow.show();
     });
     if (isDev) {
         mainWindow.loadURL(BASE_URL);
@@ -65,29 +74,100 @@ function createMainWindow() {
     }
     else {
         mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
+        mainWindow.webContents.openDevTools();
     }
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
 }
-var createDirectoryIfNotExists = function (directoryPath) {
-    if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath, { recursive: true });
+electron_1.app.on('ready', function () {
+    createMainWindow();
+    if (mainWindow)
+        mainWindow.webContents.on('did-finish-load', function () {
+            database = db_1["default"].getInstance();
+            mainWindow.webContents.send('admin-ready');
+        });
+});
+electron_1.app.on('window-all-closed', function () {
+    electron_1.app.quit();
+});
+electron_1.app.on('activate', function () {
+    if (mainWindow === null) {
+        createMainWindow();
     }
-};
+});
+//----------------------- ipcMain ---------------------------------------------------------
+//------------------------ Database -------------------------
+electron_1.ipcMain.on('reset', function (event) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, database.reset()];
+            case 1:
+                _a.sent();
+                event.reply('resetResponse', { success: true });
+                return [2 /*return*/];
+        }
+    });
+}); });
+electron_1.ipcMain.on('selectAll', function (event) { return __awaiter(void 0, void 0, void 0, function () {
+    var res;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, database.selectAll()];
+            case 1:
+                res = _a.sent();
+                event.reply('selectAllResponse', { success: true, data: res });
+                return [2 /*return*/];
+        }
+    });
+}); });
+electron_1.ipcMain.on('selectOne', function (event, index) { return __awaiter(void 0, void 0, void 0, function () {
+    var res;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, database.selectOne(index)];
+            case 1:
+                res = _a.sent();
+                event.reply('selectOneResponse', { success: true, data: res });
+                return [2 /*return*/];
+        }
+    });
+}); });
+electron_1.ipcMain.on('upsertOne', function (event, _a) {
+    var index = _a.index, text = _a.text;
+    return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0: return [4 /*yield*/, database.upsertOne(index, text)];
+                case 1:
+                    _b.sent();
+                    event.reply('upsertOneResponse', { success: true });
+                    return [2 /*return*/];
+            }
+        });
+    });
+});
+electron_1.ipcMain.on('upsertMany', function (event, datas) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        datas.map(function (data) {
+            database.upsertOne(data.index, data.text);
+        });
+        event.reply('upsertManyResponse', { success: true });
+        return [2 /*return*/];
+    });
+}); });
+//------------------------ saveFile -------------------------
 electron_1.ipcMain.on('saveVideo', function (event, _a) {
     var name = _a.name, data = _a.data;
-    var filePath = path.join(electron_1.app.getPath("downloads"), 'hyu_videos', name);
+    var filePath = path.join(videoFolderPath, name);
     var directoryPath = path.dirname(filePath);
-    createDirectoryIfNotExists(directoryPath);
+    (0, util_1.createDirectoryIfNotExists)(directoryPath);
     var buffer = Buffer.from(data);
     fs.writeFile(filePath, buffer, function (err) {
         if (err) {
-            console.error("파일 저장 중 오류 발생:", err);
             event.reply("saveVideoResponse", { success: false, error: err });
             return;
         }
-        console.log("파일 저장 완료:", filePath);
         event.reply("saveVideoResponse", { success: true });
     });
 });
@@ -96,7 +176,7 @@ electron_1.ipcMain.on('saveVoice', function (event, _a) {
     return __awaiter(void 0, void 0, void 0, function () {
         var voiceFilePath, fileDescriptor;
         return __generator(this, function (_b) {
-            voiceFilePath = path.join(__dirname, 'voice', "".concat(index, ".mp3"));
+            voiceFilePath = path.join(voiceFolderPath, "".concat(index, ".mp3"));
             try {
                 fileDescriptor = fs.openSync(voiceFilePath, 'w');
                 fs.writeFile(fileDescriptor, voiceFilePath, data);
@@ -108,20 +188,4 @@ electron_1.ipcMain.on('saveVoice', function (event, _a) {
             return [2 /*return*/];
         });
     });
-});
-electron_1.app.on('ready', function () {
-    var db = new sqlite3.Database(sqlitePath);
-    createMainWindow();
-    mainWindow.webContents.on('did-finish-load', function () {
-        // 일렉트론 setup 이 완료되면 react로 셋업메세지 전달.
-        mainWindow.webContents.send('admin-ready', db);
-    });
-});
-electron_1.app.on('window-all-closed', function () {
-    electron_1.app.quit();
-});
-electron_1.app.on('activate', function () {
-    if (mainWindow === null) {
-        createMainWindow();
-    }
 });
