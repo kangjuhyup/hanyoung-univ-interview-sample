@@ -73,8 +73,30 @@ var AdminDatabase = /** @class */ (function () {
         return AdminDatabase.instance;
     };
     AdminDatabase.prototype.init = function () {
+        var _this = this;
         AdminDatabase.db.serialize(function () {
-            AdminDatabase.db.run("\n          CREATE TABLE IF NOT EXISTS admin (\n            idx INTEGER PRIMARY KEY,\n            text TEXT,\n            file_path TEXT\n          );\n        ");
+            AdminDatabase.db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='admin'", function (err, row) {
+                if (err) {
+                    console.error("Error checking if table exists:", err);
+                }
+                else if (!row) {
+                    AdminDatabase.db.run("\n            CREATE TABLE admin (\n              idx INTEGER PRIMARY KEY,\n              text TEXT,\n              file_path TEXT\n            );\n          ", function (err) {
+                        if (err) {
+                            console.error("Error creating table:", err);
+                        }
+                        else {
+                            _this.reset().then(function () {
+                                console.log("Table created and data inserted successfully");
+                            })["catch"](function (err) {
+                                console.error("Error inserting data:", err);
+                            });
+                        }
+                    });
+                }
+                else {
+                    console.log("Table already exists");
+                }
+            });
         });
     };
     AdminDatabase.prototype.reset = function () {

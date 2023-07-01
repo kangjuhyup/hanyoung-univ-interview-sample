@@ -53,15 +53,34 @@ class AdminDatabase {
 
   private init() {
     AdminDatabase.db.serialize(() => {
-      AdminDatabase.db.run(`
-          CREATE TABLE IF NOT EXISTS admin (
-            idx INTEGER PRIMARY KEY,
-            text TEXT,
-            file_path TEXT
-          );
-        `);
+      AdminDatabase.db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='admin'", (err, row) => {
+        if (err) {
+          console.error("Error checking if table exists:", err);
+        } else if (!row) {
+          AdminDatabase.db.run(`
+            CREATE TABLE admin (
+              idx INTEGER PRIMARY KEY,
+              text TEXT,
+              file_path TEXT
+            );
+          `, (err) => {
+            if (err) {
+              console.error("Error creating table:", err);
+            } else {
+              this.reset().then(() => {
+                console.log("Table created and data inserted successfully");
+              }).catch((err) => {
+                console.error("Error inserting data:", err);
+              });
+            }
+          });
+        } else {
+          console.log("Table already exists");
+        }
+      });
     });
   }
+  
 
   reset() {
     return new Promise<void>(async (resolve,reject) => {

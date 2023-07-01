@@ -39,7 +39,7 @@ const AdminComponent = (props:{
         </InputDiv>
       ))}
       {/* <Button onClick={handleAddInput(datas.length)}>+</Button> */}
-      <Button onClick={()=>props.onClose(false)} >취소</Button>
+      <Button onClick={()=>props.onClose(false)}>닫기</Button>
       <Button onClick={handleReset}>리셋</Button>
     </AdminBody>
   );
