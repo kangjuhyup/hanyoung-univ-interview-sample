@@ -96,7 +96,9 @@ ipcMain.on('selectOne',async (event,index) => {
 })
 
 ipcMain.on('upsertOne',async (event,{index,text})=> {
-  await database.upsertOne(index,text);
+  await database.upsertOne(index,text).catch((error) => {
+    event.reply('upsertOneResponse',{success:false,error:error});
+  });
   event.reply('upsertOneResponse',{success:true});
 })
 
@@ -126,12 +128,12 @@ ipcMain.on('saveVideo', (event, { name, data }) => {
 })
 
 ipcMain.on('saveVoice', async (event, { index, data }) => {
-  const voiceFilePath = path.join(voiceFolderPath, `${index}.mp3`);
   try {
-    const fileDescriptor = fs.openSync(voiceFilePath, 'w');
-    fs.writeFile(fileDescriptor, voiceFilePath, data);
-    event.reply('saveVoiceResponse', { success: true, path: voiceFilePath });
-  } catch (error) {
-    event.reply('saveVoiceResponse', { success: false, error: error });
+    const voiceFilePath = path.join(voiceFolderPath, `${index}.mp3`);
+    fs.writeFileSync(voiceFilePath, data);
+    const response = { success: true, path: voiceFilePath };
+    event.reply('saveVoiceResponse', response);
+  } catch (err) {
+    event.reply('saveVoiceResponse', { success: false, error: err });
   }
 });

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import AdminController from "./controller/admin.controller";
 import { AdminBody, Button, InputDiv, InputFile, InputText } from "./style/admin.style";
 
@@ -11,13 +10,15 @@ const INPUT = {
 
 export type INPUT_TYPE = (typeof INPUT)[keyof typeof INPUT];
 
-const AdminComponent = () => {
-  const { datas, handleAddInput, handleInputChange, handleComplete } =
+const AdminComponent = (props:{
+  onClose: any,
+}) => {
+  const { datas, handleOnChange, handleInputChange, handleReset } =
     AdminController();
 
   return (
     <AdminBody>
-      {datas.map((value, index) => (
+      { datas && datas.map((value, index) => (
         <InputDiv key={index}>
           <InputText
             type="text"
@@ -29,15 +30,17 @@ const AdminComponent = () => {
           <InputFile
             type="file"
             accept=".mp3"
-            value={value.file}
+            // value={value.file_path}
             onChange={(e:any) =>
               handleInputChange(INPUT.FILE, index, e.target.files?.[0])
             }
           />
+          <button onClick={() => handleOnChange(index)}>변경하기</button>
         </InputDiv>
       ))}
-      <Button onClick={handleAddInput}>+</Button>
-      <Button onClick={handleComplete}>완료</Button>
+      {/* <Button onClick={handleAddInput(datas.length)}>+</Button> */}
+      <Button onClick={()=>props.onClose(false)} >취소</Button>
+      <Button onClick={handleReset}>리셋</Button>
     </AdminBody>
   );
 };

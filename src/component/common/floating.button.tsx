@@ -31,7 +31,7 @@ const Floating = (props: { children: any }) => {
   return (
     <>
       <FloatingButton onClick={clickHandler}>{props.children}</FloatingButton>
-      {isVisible ? <AdminComponent /> : <></>}
+      {isVisible ? <AdminComponent onClose={setVisible}/> : <></>}
     </>
   );
 };

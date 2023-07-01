@@ -4,6 +4,7 @@
   "private": true,
   "main": "public/electron.js",
   "author": {
+    "name" : "riverKang",
     "email": "fog0510@gmail.com"
   },
   "homepage": "./",
@@ -18,6 +19,7 @@
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "electron-is-dev": "^2.0.0",
+    "electron-rebuilder": "^0.0.20",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",
@@ -81,7 +83,7 @@
   "build": {
     "productName": "huv_interview",
     "appId": "hy.univ.interview",
-    "asar": true,
+    "asar": false,
     "protocols": {
       "name": "interview",
       "schemes": [
@@ -125,8 +127,16 @@
       "buildResources": "assets"
     },
     "extraResources": [
-      "voice/*.mp3",
-      "database/*.db"
+      {
+        "from" : "voice",
+        "to": "voice",
+        "filter" : ["**/*"]
+      },
+      {
+        "from" : "database",
+        "to":"database",
+        "filter" : ["**/*"]
+      }
     ],
     "icon": "public/assets/icons/png/hy.png"
   }

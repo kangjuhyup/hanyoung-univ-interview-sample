@@ -138,7 +138,9 @@ electron_1.ipcMain.on('upsertOne', function (event, _a) {
     return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_b) {
             switch (_b.label) {
-                case 0: return [4 /*yield*/, database.upsertOne(index, text)];
+                case 0: return [4 /*yield*/, database.upsertOne(index, text)["catch"](function (error) {
+                        event.reply('upsertOneResponse', { success: false, error: error });
+                    })];
                 case 1:
                     _b.sent();
                     event.reply('upsertOneResponse', { success: true });
@@ -174,16 +176,16 @@ electron_1.ipcMain.on('saveVideo', function (event, _a) {
 electron_1.ipcMain.on('saveVoice', function (event, _a) {
     var index = _a.index, data = _a.data;
     return __awaiter(void 0, void 0, void 0, function () {
-        var voiceFilePath, fileDescriptor;
+        var voiceFilePath, response;
         return __generator(this, function (_b) {
-            voiceFilePath = path.join(voiceFolderPath, "".concat(index, ".mp3"));
             try {
-                fileDescriptor = fs.openSync(voiceFilePath, 'w');
-                fs.writeFile(fileDescriptor, voiceFilePath, data);
-                event.reply('saveVoiceResponse', { success: true, path: voiceFilePath });
+                voiceFilePath = path.join(voiceFolderPath, "".concat(index, ".mp3"));
+                fs.writeFileSync(voiceFilePath, data);
+                response = { success: true, path: voiceFilePath };
+                event.reply('saveVoiceResponse', response);
             }
-            catch (error) {
-                event.reply('saveVoiceResponse', { success: false, error: error });
+            catch (err) {
+                event.reply('saveVoiceResponse', { success: false, error: err });
             }
             return [2 /*return*/];
         });
