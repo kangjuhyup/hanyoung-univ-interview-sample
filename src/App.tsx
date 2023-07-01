@@ -16,17 +16,12 @@ function App() {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.on('admin-ready',(evnet:any) => {        
         setDatabase();
-        ipcRenderer.send('reset');
-        
-      })
-      ipcRenderer.on('resetResponse',() => {
         ipcRenderer.send('selectAll');
+
+        ipcRenderer.once('selectAllResponse',(event:any,response:{success:boolean,data:Data[]}) => {
+          setData(response.data);
+        })
       })
-      
-      ipcRenderer.on('selectAllResponse',(event:any,response:{success:boolean,data:Data[]}) => {
-        setData(response.data);
-      })
-      
     }
   },[])
 

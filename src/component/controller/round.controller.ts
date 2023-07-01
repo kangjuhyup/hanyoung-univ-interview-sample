@@ -5,10 +5,12 @@ const RoundController = () => {
 
 
   const clickNextRound = () => {
+    if(round === 19) return;
     forceStop(round+1);
   }
 
   const clickPrevRound = () => {
+    if(round === 0 ) return;
     forceStop(round-1);
   }
 
