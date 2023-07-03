@@ -74,7 +74,6 @@ function createMainWindow() {
     }
     else {
         mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
-        mainWindow.webContents.openDevTools();
     }
     mainWindow.on('closed', function () {
         mainWindow = null;
@@ -83,10 +82,17 @@ function createMainWindow() {
 electron_1.app.on('ready', function () {
     createMainWindow();
     if (mainWindow)
-        mainWindow.webContents.on('did-finish-load', function () {
-            database = db_1["default"].getInstance();
-            mainWindow.webContents.send('admin-ready');
-        });
+        mainWindow.webContents.on('did-finish-load', function () { return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, db_1["default"].getInstance()];
+                    case 1:
+                        database = _a.sent();
+                        mainWindow.webContents.send('admin-ready');
+                        return [2 /*return*/];
+                }
+            });
+        }); });
 });
 electron_1.app.on('window-all-closed', function () {
     electron_1.app.quit();

@@ -8,14 +8,8 @@ const MainController = () => {
   const [voiceSrc, setVoiceSrc] = useState<string>('');
   const [text, setText] = useState<string>('');
   const { data: dbData, isSetup: dbSetup } = dbStore();
-
-  console.log('dbData : ' , dbData);
-
-
   useEffect(() => {
-
     voiceSource();
-
   }, [round])
 
 

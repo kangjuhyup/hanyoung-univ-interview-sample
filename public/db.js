@@ -39,6 +39,7 @@ exports.__esModule = true;
 var sqlite3 = require("sqlite3");
 var path = require("path");
 var electron_1 = require("./electron");
+var electron_2 = require("electron");
 var TEXT = {
     0: '1분간 자기소개를 해보세요.',
     1: '자신의 장점과 단점에 대하여 이야기해 보세요.',
@@ -64,37 +65,63 @@ var TEXT = {
 var AdminDatabase = /** @class */ (function () {
     function AdminDatabase() {
         AdminDatabase.db = new sqlite3.Database(electron_1.dbFilePath);
-        this.init();
     }
     AdminDatabase.getInstance = function () {
-        if (!AdminDatabase.instance) {
-            AdminDatabase.instance = new AdminDatabase();
-        }
-        return AdminDatabase.instance;
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!!AdminDatabase.instance) return [3 /*break*/, 2];
+                        AdminDatabase.instance = new AdminDatabase();
+                        return [4 /*yield*/, AdminDatabase.instance.init()];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2: return [2 /*return*/, AdminDatabase.instance];
+                }
+            });
+        });
     };
     AdminDatabase.prototype.init = function () {
-        var _this = this;
-        AdminDatabase.db.serialize(function () {
-            AdminDatabase.db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='admin'", function (err, row) {
-                if (err) {
-                    console.error("Error checking if table exists:", err);
-                }
-                else if (!row) {
-                    AdminDatabase.db.run("\n            CREATE TABLE admin (\n              idx INTEGER PRIMARY KEY,\n              text TEXT,\n              file_path TEXT\n            );\n          ", function (err) {
-                        if (err) {
-                            console.error("Error creating table:", err);
-                        }
-                        else {
-                            _this.reset().then(function () {
-                                console.log("Table created and data inserted successfully");
-                            })["catch"](function (err) {
-                                console.error("Error inserting data:", err);
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, new Promise(function (resolve, reject) {
+                            AdminDatabase.db.serialize(function () {
+                                AdminDatabase.db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='admin'", function (err, row) {
+                                    if (err) {
+                                        electron_2.dialog.showErrorBox('Error', err.message);
+                                        console.error("Error checking if table exists:", err);
+                                        reject(err);
+                                    }
+                                    else if (!row) {
+                                        AdminDatabase.db.run("\n              CREATE TABLE admin (\n                idx INTEGER PRIMARY KEY,\n                text TEXT,\n                file_path TEXT\n              );\n            ", function (err) {
+                                            if (err) {
+                                                console.error("Error creating table:", err);
+                                                reject(err);
+                                            }
+                                            else {
+                                                _this.reset().then(function () {
+                                                    console.log("Table created and data inserted successfully");
+                                                    resolve();
+                                                })["catch"](function (err) {
+                                                    console.error("Error inserting data:", err);
+                                                    reject(err);
+                                                });
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        console.log("Table already exists");
+                                        resolve();
+                                    }
+                                });
                             });
-                        }
-                    });
-                }
-                else {
-                    console.log("Table already exists");
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });

@@ -1,6 +1,7 @@
 import * as sqlite3 from 'sqlite3';
 import * as path from 'path';
 import {dbFilePath} from './electron';
+import { dialog } from 'electron';
 
 const TEXT = {
   0: '1분간 자기소개를 해보세요.',
@@ -41,45 +42,54 @@ class AdminDatabase {
 
   private constructor() {
     AdminDatabase.db = new sqlite3.Database(dbFilePath);
-    this.init();
   }
 
-  public static getInstance(): AdminDatabase {
+  public static async getInstance(): Promise<AdminDatabase> {
     if (!AdminDatabase.instance) {
       AdminDatabase.instance = new AdminDatabase();
+      await AdminDatabase.instance.init();
     }
     return AdminDatabase.instance;
   }
 
-  private init() {
-    AdminDatabase.db.serialize(() => {
-      AdminDatabase.db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='admin'", (err, row) => {
-        if (err) {
-          console.error("Error checking if table exists:", err);
-        } else if (!row) {
-          AdminDatabase.db.run(`
-            CREATE TABLE admin (
-              idx INTEGER PRIMARY KEY,
-              text TEXT,
-              file_path TEXT
-            );
-          `, (err) => {
-            if (err) {
-              console.error("Error creating table:", err);
-            } else {
-              this.reset().then(() => {
-                console.log("Table created and data inserted successfully");
-              }).catch((err) => {
-                console.error("Error inserting data:", err);
-              });
-            }
-          });
-        } else {
-          console.log("Table already exists");
-        }
+  private async init() {
+    await new Promise<void>((resolve, reject) => {
+      AdminDatabase.db.serialize(() => {
+        AdminDatabase.db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='admin'", (err, row) => {
+          if (err) {
+            dialog.showErrorBox('Error', err.message);
+            console.error("Error checking if table exists:", err);
+            reject(err);
+          } else if (!row) {
+            AdminDatabase.db.run(`
+              CREATE TABLE admin (
+                idx INTEGER PRIMARY KEY,
+                text TEXT,
+                file_path TEXT
+              );
+            `, (err) => {
+              if (err) {
+                console.error("Error creating table:", err);
+                reject(err);
+              } else {
+                this.reset().then(() => {
+                  console.log("Table created and data inserted successfully");
+                  resolve();
+                }).catch((err) => {
+                  console.error("Error inserting data:", err);
+                  reject(err);
+                });
+              }
+            });
+          } else {
+            console.log("Table already exists");
+            resolve();
+          }
+        });
       });
     });
   }
+  
   
 
   reset() {

@@ -7,6 +7,7 @@ import MainPage from "./page/main.page";
 import dbStore, { Data } from "./store/db.store";
 
 function App() {
+  const [isInit,setInit] = useState(false);
   const [start,startHandler] = useState(false);
 
   const {setDatabase,setData} = dbStore();
@@ -17,9 +18,9 @@ function App() {
       ipcRenderer.on('admin-ready',(evnet:any) => {        
         setDatabase();
         ipcRenderer.send('selectAll');
-
         ipcRenderer.once('selectAllResponse',(event:any,response:{success:boolean,data:Data[]}) => {
           setData(response.data);
+          setInit(true);
         })
       })
     }
@@ -30,12 +31,18 @@ function App() {
       <QueryClientProvider client={new QueryClient()}>
         <HeaderComponent />
         {
-          !start ?
-          <FirstPage startHandler={startHandler}/>
+          !start?
+          <FirstPage isInit={isInit} startHandler={startHandler}/>
           :
           <MainPage />
         }
-        <Floating>+</Floating>
+        {
+          isInit?
+          <Floating>+</Floating>
+          :
+          <></>
+        }
+        
       </QueryClientProvider>
     </div>
   );

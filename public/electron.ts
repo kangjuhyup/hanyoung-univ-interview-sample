@@ -47,7 +47,6 @@ function createMainWindow(): void {
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
-    mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on('closed', (): void => {
@@ -58,9 +57,9 @@ function createMainWindow(): void {
 app.on('ready', (): void => {
   createMainWindow();
   if (mainWindow)
-    mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.on('did-finish-load', async () => {
       
-      database = AdminDatabase.getInstance();
+      database = await AdminDatabase.getInstance();
       mainWindow!.webContents.send('admin-ready');
     });
 });
