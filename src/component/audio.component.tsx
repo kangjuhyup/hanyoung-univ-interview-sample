@@ -10,16 +10,22 @@ const AudioComponentBody = styled.div`
   width: 100%;
 `;
 
-const AudioComponent = (props: { voiceSrc: string; text: string }) => {
-  const { audioRef, onPlay, onEnded, changeSource } = AudioController();
+const AudioComponent = (props: { voiceSrc: {isChanged:boolean,src:string}; text: string }) => {
+  const { audioRef, onPlay, onEnded } = AudioController();
 
   useEffect(() => {
-    changeSource(props.voiceSrc);
-  }, [props.voiceSrc]);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src=""; // empty source
+      audioRef.current.src = `{props.voiceSrc.src}?${Date.now()}`;
+    }
+  }, [audioRef, props.voiceSrc]);
+
+
 
   return (
     <AudioComponentBody>
-      <audio ref={audioRef} onEnded={onEnded} />
+      <audio ref={audioRef} onEnded={onEnded}/>
       <button
         onClick={onPlay}
         style={{
