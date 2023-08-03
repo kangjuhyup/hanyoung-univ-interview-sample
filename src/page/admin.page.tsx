@@ -30,7 +30,6 @@ const AdminComponent = (props:{
           <InputFile
             type="file"
             accept=".mp3"
-            // value={value.file_path}
             onChange={(e:any) =>
               handleInputChange(INPUT.FILE, index, e.target.files?.[0])
             }
@@ -40,7 +39,7 @@ const AdminComponent = (props:{
       ))}
       {/* <Button onClick={handleAddInput(datas.length)}>+</Button> */}
       <Button onClick={()=>props.onClose(false)}>닫기</Button>
-      <Button onClick={handleReset}>리셋</Button>
+      {/* <Button onClick={handleReset}>리셋</Button> */}
     </AdminBody>
   );
 };

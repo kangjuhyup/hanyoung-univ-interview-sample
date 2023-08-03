@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import styled from "styled-components";
 import AudioComponent from "../component/audio.component";
 import CameraCompoent from "../component/camera.component";

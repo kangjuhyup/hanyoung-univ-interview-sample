@@ -17,7 +17,7 @@ const AudioComponent = (props: { voiceSrc: {isChanged:boolean,src:string}; text:
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.src=""; // empty source
-      audioRef.current.src = `{props.voiceSrc.src}?${Date.now()}`;
+      audioRef.current.src = `${props.voiceSrc.src}?${Date.now()}`;
     }
   }, [audioRef, props.voiceSrc]);
 

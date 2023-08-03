@@ -18,6 +18,7 @@ const AdminController = () => {
   }, [currentDatas]);
 
   const handleInputChange = (type: INPUT_TYPE, index: number, value: any) => {
+    console.log('handleInputChange : ',index)
     const newData = [...datas];
     if (type === "text") {
       newData[index] = {
@@ -69,7 +70,9 @@ const AdminController = () => {
   const handleReset = () => {
     if (process.env.NODE_ENV === "production") {
       const { ipcRenderer } = window.require("electron");
-      ipcRenderer.on("resetResponse", () => {
+      ipcRenderer.send("reset");
+      ipcRenderer.once("resetResponse", () => {
+        alert('초기화 성공');
         ipcRenderer.send("selectAll");
       });
     }

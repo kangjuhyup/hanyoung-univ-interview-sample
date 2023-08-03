@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { TEXT, VOICE } from "../../const/voice.const";
 import allStore from "../../store/all.store";
 import dbStore from "../../store/db.store";
 
@@ -15,21 +14,23 @@ const MainController = () => {
   const [text, setText] = useState<string>("");
   const { data: dbData, isSetup: dbSetup } = dbStore();
   useEffect(() => {
+    console.log('changeRound : ', round)
     voiceSource(false);
-  }, [round]);
-
-  useEffect(() => {
     if (process.env.NODE_ENV === "production") {
       const { ipcRenderer } = window.require("electron");
       ipcRenderer.on("saveVoiceResponse", (event: any, result: any) => {
+        console.log("saveVoiceResponse : ", result);
         if (result.success) {
+          console.log("변경성공 : " , round);
           voiceSource(true);
         }
       });
     }
-  }, []);
+  }, [round]);
+
 
   const voiceSource = (isChanged: boolean) => {
+    console.log('voiceSource : ',round)
     if (round === undefined) return;
     if (!dbSetup) return;
     setText(dbData[round].text);
